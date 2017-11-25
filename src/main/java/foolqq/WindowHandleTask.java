@@ -1,10 +1,10 @@
-package foolqq.task;
+package foolqq;
 
-import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 
 import foolqq.BaseQQWindowContext;
 import foolqq.model.QQMsg;
+import foolqq.model.QQMsgBuilder;
 import foolqq.model.QQWindow;
 import static foolqq.tool.QQWindowTool.*;
 
@@ -20,16 +21,10 @@ public class WindowHandleTask implements Runnable {
 
 	private BaseQQWindowContext context;
 
-	private Map<String, QQWindow> map;
 
-	private Robot robot;
-
-	private static String msgHeadRegExp = "(.*)\\((.+)\\)\\s+([0-9]{1,2}:[0-9]{2}:[0-9]{2})";
-
-	public WindowHandleTask(BaseQQWindowContext context, Map<String, QQWindow> map, Robot robot) {
+	public WindowHandleTask(BaseQQWindowContext context) {
 		this.context = context;
-		this.map = map;
-		this.robot = robot;
+		updateMap();
 	}
 
 	@Override
@@ -38,7 +33,8 @@ public class WindowHandleTask implements Runnable {
 			// 1.update map(location of QQWindow)
 			// 2.readMessage and call onMessage
 			updateMap();
-			readMessage();
+
+			context.onReadMessage();
 		}
 	}
 
@@ -46,7 +42,7 @@ public class WindowHandleTask implements Runnable {
 	 * must used in synchronized block or method on context
 	 */
 	private void updateMap(){
-		BufferedImage image = getScreen(robot);
+		BufferedImage image = getScreen(context.getRobot());
 		int width = image.getWidth();
 		int height = image.getHeight();
 		if(isUniColor(image)) {
@@ -54,7 +50,7 @@ public class WindowHandleTask implements Runnable {
 			// It might cause problem that bot keeps an empty map!
 			return;
 		}else{
-			map.clear();
+			Map<String,QQWindow> map = new HashMap<>();
 			File[] f = new File(".").listFiles();
 			for (int i = 0; i < f.length; i++) {
 				if (f[i].getName().endsWith(".png") && !f[i].getName().equals("point.png")) {
@@ -84,46 +80,10 @@ public class WindowHandleTask implements Runnable {
 					map.put(name, win);
 				}
 			}
+			context.onQQWindowUpdate(image,map);
 		}
 	}
 
-	private void readMessage(){
-		for(String name : map.keySet()){
-			String msg = context.readQQMsg(name);
-			if (msg != null && msg.trim().length() > 0) {
-				List<QQMsg> stack = getMsgStack(msg.trim().split("\n"));
-				for (QQMsg m : stack) {
-					context.onMessage(name, m);
-				}
 
-				context.clearQQMsg();
-			}
-		}
-	}
-
-	private List<QQMsg> getMsgStack(String[] msgs) {
-
-		List<QQMsg> stack = new ArrayList<QQMsg>();
-		for (int j = 0; j < msgs.length; j++) {
-			if (msgs[j].matches(msgHeadRegExp)) {
-				Pattern pat = Pattern.compile(msgHeadRegExp);
-				Matcher mat = pat.matcher(msgs[j]);
-				QQMsg qqMsg = new QQMsg();
-				if (mat.find()) {
-					qqMsg.setNick(mat.group(1).trim());
-					qqMsg.setQqOrEmail(mat.group(2).trim());
-					qqMsg.setTime(mat.group(3).trim());
-					stack.add(qqMsg);
-				}
-			} else {
-				if (stack.size() > 0) {
-					QQMsg last = stack.get(stack.size() - 1);
-					last.setContent(last.getContent() + msgs[j] + "\n");
-				}
-			}
-		}
-
-		return stack;
-	}
 
 }

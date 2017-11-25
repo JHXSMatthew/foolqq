@@ -41,22 +41,6 @@ public class QQMsg {
 		return content;
 	}
 
-	public void setNick(String nick) {
-		this.nick = nick;
-	}
-
-	public void setQqOrEmail(String qqOrEmail) {
-		this.qqOrEmail = qqOrEmail;
-	}
-
-	public void setTime(String time) {
-		this.time = time;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
 	@Override
 	public String toString() {
 		return "QQMsg [nick=" + nick + ", qqOrEmail=" + qqOrEmail + ", time=" + time + ", content=" + content + "]";

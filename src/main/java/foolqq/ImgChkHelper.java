@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 public class ImgChkHelper {
 
 	public static boolean validImage(String screen, String img) throws IOException {
-
 		BufferedImage screenImage = ImageIO.read(new File(screen));
 		BufferedImage point = ImageIO.read(new File(img));
 		int width = screenImage.getWidth();

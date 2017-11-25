@@ -12,6 +12,7 @@ public class GlobalKeyListener implements NativeKeyListener {
 		if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
 			try {
 				GlobalScreen.unregisterNativeHook();
+				System.err.println("ESC pressed, system quitting....");
 				System.exit(1);
 			} catch (NativeHookException e1) {
 
