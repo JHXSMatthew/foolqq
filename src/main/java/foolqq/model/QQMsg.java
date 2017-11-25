@@ -1,5 +1,8 @@
 package foolqq.model;
 
+/**
+ * Immutable message object.
+ */
 public class QQMsg {
 
 	private String nick;
@@ -8,34 +11,46 @@ public class QQMsg {
 	
 	private String time;
 	
-	private String content="";
+	private String content = "";
+
+	public QQMsg(String nick, String qqOrEmail, String time, String content) {
+		this.nick = nick;
+		this.qqOrEmail = qqOrEmail;
+		this.time = time;
+		this.content = content;
+	}
+
+	public QQMsg(){
+
+	}
 
 	public String getNick() {
 		return nick;
-	}
-
-	public void setNick(String nick) {
-		this.nick = nick;
 	}
 
 	public String getQqOrEmail() {
 		return qqOrEmail;
 	}
 
-	public void setQqOrEmail(String qqOrEmail) {
-		this.qqOrEmail = qqOrEmail;
-	}
 
 	public String getTime() {
 		return time;
 	}
 
-	public void setTime(String time) {
-		this.time = time;
-	}
-
 	public String getContent() {
 		return content;
+	}
+
+	public void setNick(String nick) {
+		this.nick = nick;
+	}
+
+	public void setQqOrEmail(String qqOrEmail) {
+		this.qqOrEmail = qqOrEmail;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 	public void setContent(String content) {

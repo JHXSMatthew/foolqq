@@ -1,8 +1,6 @@
 package foolqq;
 
-import java.awt.AWTException;
-import java.awt.Image;
-import java.awt.Robot;
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -49,7 +47,7 @@ public abstract class BaseQQWindowContext {
 	}
 
 	public BaseQQWindowContext(File point) throws AWTException, IOException, NativeHookException {
-		robot = new Robot();
+		robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
 		pImage = ImageIO.read(point);
 		WindowHandleTask wintask = new WindowHandleTask(this, map, robot);
 		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(wintask, checkInterval, checkInterval,

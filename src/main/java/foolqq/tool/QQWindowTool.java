@@ -21,6 +21,23 @@ public class QQWindowTool {
 		return true;
 	}
 
+	/**
+	 *
+	 * @param capture the pic to see if uni color
+	 * @return  true if all pixels are the same color
+	 */
+	public static boolean isUniColor(BufferedImage capture){
+		int pic = capture.getRGB(capture.getMinX(),capture.getMinY());
+		for(int i = 0; i < capture.getWidth() ; i++ ){
+			for(int j = 0 ; j < capture.getHeight() ; j++){
+				if( pic != capture.getRGB(i,j)){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public static String getImgName(String name) {
 
 		return name.replaceAll(".png", "");
@@ -28,7 +45,6 @@ public class QQWindowTool {
 	}
 
 	public static BufferedImage getScreen(Robot robot) {
-
 		return robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 
 	}

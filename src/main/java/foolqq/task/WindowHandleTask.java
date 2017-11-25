@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
+
 import foolqq.BaseQQWindowContext;
 import foolqq.model.QQMsg;
 import foolqq.model.QQWindow;
@@ -34,10 +35,26 @@ public class WindowHandleTask implements Runnable {
 	@Override
 	public void run() {
 		synchronized (context) {
+			// 1.update map(location of QQWindow)
+			// 2.readMessage and call onMessage
+			updateMap();
+			readMessage();
+		}
+	}
+
+	/**
+	 * must used in synchronized block or method on context
+	 */
+	private void updateMap(){
+		BufferedImage image = getScreen(robot);
+		int width = image.getWidth();
+		int height = image.getHeight();
+		if(isUniColor(image)) {
+			// NOTE: Robot capture a blackScreen without desktop access.
+			// It might cause problem that bot keeps an empty map!
+			return;
+		}else{
 			map.clear();
-			BufferedImage image = getScreen(robot);
-			int width = image.getWidth();
-			int height = image.getHeight();
 			File[] f = new File(".").listFiles();
 			for (int i = 0; i < f.length; i++) {
 				if (f[i].getName().endsWith(".png") && !f[i].getName().equals("point.png")) {
@@ -65,19 +82,23 @@ public class WindowHandleTask implements Runnable {
 						continue;
 
 					map.put(name, win);
-					String msg = context.readQQMsg(name);
-					if (msg != null && msg.trim().length() > 0) {
-						List<QQMsg> stack = getMsgStack(msg.trim().split("\n"));
-						for (QQMsg m : stack) {
-							context.onMessage(name, m);
-						}
-
-						context.clearQQMsg();
-					}
 				}
 			}
 		}
+	}
 
+	private void readMessage(){
+		for(String name : map.keySet()){
+			String msg = context.readQQMsg(name);
+			if (msg != null && msg.trim().length() > 0) {
+				List<QQMsg> stack = getMsgStack(msg.trim().split("\n"));
+				for (QQMsg m : stack) {
+					context.onMessage(name, m);
+				}
+
+				context.clearQQMsg();
+			}
+		}
 	}
 
 	private List<QQMsg> getMsgStack(String[] msgs) {
